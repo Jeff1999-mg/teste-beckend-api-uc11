@@ -13,7 +13,7 @@ from datetime import date, datetime, timedelta
 import pytest
 
 from app. enums import PrioridadeTarefa, StatusTarefa
-from app.exceptions import ValorInvalido
+from app.exceptions import TituloObrigatorio, ValorInvalido
 from app.models import Tarefa, Usuario
 
 def nova_tarefa(**ajustes) -> Tarefa:
@@ -168,3 +168,44 @@ def test_tarefas_pendentes_filtra_as_concluidas():
     concluida.concluir()
     usuario.tarefas = [pendente, concluida]
     assert usuario.tarefas_pendentes() == [pendente]
+    
+def test_concluir_tarefa_ja_concluida_preserva_a_data_original():
+    """O caso que mais reprova implementações ingênuas da RN-03.
+    
+    Concluir de novo uma tarefa já concluída não pode reescrever a data em
+    que ela foi concluída da primeira vez.
+    """
+    original = datetime(2026, 1, 10, 9, 0, 0)
+    tarefa = nova_tarefa()
+    tarefa.concluir(agora=original)
+    tarefa.concluir(agora=datetime(2026, 3, 1, 15, 30, 0))
+    assert tarefa.concluido_em == original
+    
+# =====================================================================
+# Dia 3 - "@pytest.mark.parametrize": a mesma regra, várias entradas
+# =====================================================================
+
+@pytest.mark.parametrize("titulo_invalido", ["", "  "])
+def test_titulo_vazio_e_recusado(titulo_invalido):
+    with pytest.raises(TituloObrigatorio):
+        nova_tarefa(titulo=titulo_invalido)
+        
+@pytest.mark.parametrize("nome_invalido", ["", "  ", "\t", "\n"])
+def test_nome_vazio_e_recusado(nome_invalido):
+    """Quatro representantes da mesma classe: texto sem caractere útil."""
+    with pytest.raises(ValorInvalido):
+        novo_usuario(nome=nome_invalido)
+
+@pytest.mark.parametrize(
+    "informado, esperado",
+    [
+        ("ana@exemplo.com", "ana@exemplo.com"),
+        ("ANA@EXEMPLO.COM", "ana@exemplo.com"),
+        ("  ana@exemplo.com  ", "ana@exemplo.com"),
+        ("Ana@Exemplo.Com\n", "ana@exemplo.com"),
+    ],
+)
+def test_normalizar_email_padroniza_espacos_e_maiusculas(informado, esperado):
+    """A RN-01 só se sustenta se a comparação for feita sobre a forma
+    normalizada: sem isso, "Ana@... e "ana@..." seriam dois cadastros."""
+    assert Usuario.normalizar_email(informado) == esperado
