@@ -61,8 +61,10 @@ def _ativar_chaves_estrangeiras(conexao_dbapi: Any, _registro: Any) -> None:
     O `isinstance` garante que o comando só é enviado a conexões SQLite; com
     PostgreSQL, a função não faz nada.
     """
+    
     if isinstance(conexao_dbapi, sqlite3.Connection):
         cursor = conexao_dbapi.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON")
         cursor.close()
 
 
