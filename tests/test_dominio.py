@@ -209,3 +209,136 @@ def test_normalizar_email_padroniza_espacos_e_maiusculas(informado, esperado):
     """A RN-01 só se sustenta se a comparação for feita sobre a forma
     normalizada: sem isso, "Ana@... e "ana@..." seriam dois cadastros."""
     assert Usuario.normalizar_email(informado) == esperado
+    
+# ============================================================================
+# Dia 4 – fixtures: a senha (RN-05), com o `hasher` do conftest.py
+# ============================================================================
+
+def test_a_senha_nao_fica_guardada_em_atributo_algum(hasher):
+    """O texto puro é usado dentro de `definir_senha` e descartado.
+
+    O que se verifica aqui é que ele não sobrou em nenhum atributo do objeto.
+    Que o *hash* não revela a senha é outra garantia, e está em
+    `test_seguranca.py`.
+    """
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert not hasattr(usuario, "senha")
+    assert usuario._senha_hash != "senha123"
+
+
+def test_senha_correta_confere(hasher):
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert usuario.senha_confere("senha123", hasher) is True
+
+
+def test_senha_errada_nao_confere(hasher):
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert usuario.senha_confere("errada", hasher) is False
+
+
+def test_definir_senha_de_novo_substitui_a_anterior(hasher):
+    usuario = novo_usuario()
+    usuario.definir_senha("antiga", hasher)
+    usuario.definir_senha("nova", hasher)
+    assert usuario.senha_confere("nova", hasher) is True
+    assert usuario.senha_confere("antiga", hasher) is False
+
+
+def test_repr_nao_expoe_o_hash_da_senha(hasher):
+    """Um `print` do objeto não deve despejar credencial em log."""
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert "senha123" not in repr(usuario)
+    assert usuario._senha_hash not in repr(usuario)
+    
+# ============================================================================
+# Dia 4 – fixtures: a senha (RN-05), com o `hasher` do conftest.py
+# ============================================================================
+
+def test_a_senha_nao_fica_guardada_em_atributo_algum(hasher):
+    """O texto puro é usado dentro de `definir_senha` e descartado.
+
+    O que se verifica aqui é que ele não sobrou em nenhum atributo do objeto.
+    Que o *hash* não revela a senha é outra garantia, e está em
+    `test_seguranca.py`.
+    """
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert not hasattr(usuario, "senha")
+    assert usuario._senha_hash != "senha123"
+
+
+def test_senha_correta_confere(hasher):
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert usuario.senha_confere("senha123", hasher) is True
+
+
+def test_senha_errada_nao_confere(hasher):
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert usuario.senha_confere("errada", hasher) is False
+
+
+def test_definir_senha_de_novo_substitui_a_anterior(hasher):
+    usuario = novo_usuario()
+    usuario.definir_senha("antiga", hasher)
+    usuario.definir_senha("nova", hasher)
+    assert usuario.senha_confere("nova", hasher) is True
+    assert usuario.senha_confere("antiga", hasher) is False
+
+
+def test_repr_nao_expoe_o_hash_da_senha(hasher):
+    """Um `print` do objeto não deve despejar credencial em log."""
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert "senha123" not in repr(usuario)
+    assert usuario._senha_hash not in repr(usuario)
+    
+# ============================================================================
+# Dia 4 – fixtures: a senha (RN-05), com o `hasher` do conftest.py
+# ============================================================================
+
+def test_a_senha_nao_fica_guardada_em_atributo_algum(hasher):
+    """O texto puro é usado dentro de `definir_senha` e descartado.
+
+    O que se verifica aqui é que ele não sobrou em nenhum atributo do objeto.
+    Que o *hash* não revela a senha é outra garantia, e está em
+    `test_seguranca.py`.
+    """
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert not hasattr(usuario, "senha")
+    assert usuario._senha_hash != "senha123"
+
+
+def test_senha_correta_confere(hasher):
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert usuario.senha_confere("senha123", hasher) is True
+
+
+def test_senha_errada_nao_confere(hasher):
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert usuario.senha_confere("errada", hasher) is False
+
+
+def test_definir_senha_de_novo_substitui_a_anterior(hasher):
+    usuario = novo_usuario()
+    usuario.definir_senha("antiga", hasher)
+    usuario.definir_senha("nova", hasher)
+    assert usuario.senha_confere("nova", hasher) is True
+    assert usuario.senha_confere("antiga", hasher) is False
+
+
+def test_repr_nao_expoe_o_hash_da_senha(hasher):
+    """Um `print` do objeto não deve despejar credencial em log."""
+    usuario = novo_usuario()
+    usuario.definir_senha("senha123", hasher)
+    assert "senha123" not in repr(usuario)
+    assert usuario._senha_hash not in repr(usuario)
+    
