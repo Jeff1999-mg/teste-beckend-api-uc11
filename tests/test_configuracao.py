@@ -49,3 +49,32 @@ def test_parametros_da_url_sao_preservados():
 # Dia 6 - "monkeypatch": a DATABASE_URL é obrigatória
 # ===================================================================
 
+def test_sem_database_url_a_aplicacao_recusa_subir(monkeypatch):
+    """Não existe banco padrão silencioso.
+    
+    Cair em SQLite quando a variável falta esconde um problema: quando o
+    padrão coincide com o valor esperado, não há como saber se o ".env" foi
+    """
+    
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    with pytest.raises(RuntimeError):
+        Configuracao.do.ambiente()
+        
+@pytest.mark.parametrize("valor_vazio", ["", "  "])
+def test_database_url_vazia_conta_como_ausente(monkeypatch, valor_vazio):
+    """Variável declarada mas sem valor é o erro de digitação mais comum no
+    ".env", e precisa falhar igual à variável ausente."""
+    monkeypatch.setenv("DATABASE_URL", valor_vazio)
+    with pytest.raises(RuntimeError):
+        Configuracao.do.ambiente()
+        
+def test_a_mensagem_de_erro_diz_onde_o_env_foi_procurado(monkeypatch):
+    """O caminho na mensagem é o que resolve o caso mais frequente: o ".env
+    existe, mas em outra pasta.
+    
+    "pytest.raises(...) as erro" guarda a exceção para inspecioná-la depois."
+    """
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    with pytest.raises(RuntimeError, match="DATABASE_URL") as erro:
+        Configuracao.do.ambiente()
+    assert str(CAMINHO_DO_ENV) in str(erro.value)
