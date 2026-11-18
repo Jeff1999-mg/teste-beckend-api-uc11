@@ -1,7 +1,15 @@
 
 import pytest
 
-from app.config import normalizar_url
+from app.config import (
+    CAMINHO_DO_ENV,
+    ORIGENS_PADRAO,
+    RAIZ_DO_PROJETO,
+    SEGREDO_DE_EXEMPLO,
+    TAMANHO_MINIMO_DO_SEGREDO,
+    Configuracao,
+    normalizar_url,
+)
 
 # ===================================================================
 # Dia 3 - "parametrize" numa função pura: a normalização da URL
@@ -36,3 +44,8 @@ def test_parametros_da_url_sao_preservados():
     """Banco gerenciado costuma exigir SSL, que vem como parâmetro na URL."""
     url = "postgres://u:s@host:5432/banco?sslmode=require"
     assert normalizar_url(url).endswith("?sslmode=require")
+
+# ===================================================================
+# Dia 6 - "monkeypatch": a DATABASE_URL é obrigatória
+# ===================================================================
+
